@@ -6,9 +6,9 @@ namespace Pollen\Kernel\Providers;
 
 use Pollen\Log\LogManager;
 use Pollen\Log\LogManagerInterface;
-use Pollen\Container\BaseServiceProvider;
+use Pollen\Container\BootableServiceProvider;
 
-class LogServiceProvider extends BaseServiceProvider
+class LogServiceProvider extends BootableServiceProvider
 {
     /**
      * @var string[]

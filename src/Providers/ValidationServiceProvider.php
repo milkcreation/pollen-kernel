@@ -6,9 +6,9 @@ namespace Pollen\Kernel\Providers;
 
 use Pollen\Validation\Validator;
 use Pollen\Validation\ValidatorInterface;
-use Pollen\Container\BaseServiceProvider;
+use Pollen\Container\BootableServiceProvider;
 
-class ValidationServiceProvider extends BaseServiceProvider
+class ValidationServiceProvider extends BootableServiceProvider
 {
     /**
      * @var string[]

@@ -14,9 +14,9 @@ use Pollen\Mail\MailQueueFactory;
 use Pollen\Mail\MailQueueFactoryInterface;
 use PHPMailer\PHPMailer\PHPMailer;
 use Pollen\Support\Env;
-use Pollen\Container\BaseServiceProvider;
+use Pollen\Container\BootableServiceProvider;
 
-class MailServiceProvider extends BaseServiceProvider
+class MailServiceProvider extends BootableServiceProvider
 {
     /**
      * @var string[]

@@ -6,9 +6,9 @@ namespace Pollen\Kernel\Providers;
 
 use Pollen\Asset\AssetManager;
 use Pollen\Asset\AssetManagerInterface;
-use Pollen\Container\BaseServiceProvider;
+use Pollen\Container\BootableServiceProvider;
 
-class AssetServiceProvider extends BaseServiceProvider
+class AssetServiceProvider extends BootableServiceProvider
 {
     /**
      * @var string[]

@@ -6,9 +6,9 @@ namespace Pollen\Kernel\Providers;
 
 use Pollen\Event\EventDispatcher;
 use Pollen\Event\EventDispatcherInterface;
-use Pollen\Container\BaseServiceProvider;
+use Pollen\Container\BootableServiceProvider;
 
-class EventServiceProvider extends BaseServiceProvider
+class EventServiceProvider extends BootableServiceProvider
 {
     protected $provides = [
         EventDispatcherInterface::class

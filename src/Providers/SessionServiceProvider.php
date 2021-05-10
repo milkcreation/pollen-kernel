@@ -7,9 +7,9 @@ namespace Pollen\Kernel\Providers;
 use Pollen\Session\SessionManager;
 use Pollen\Session\SessionManagerInterface;
 use Pollen\Support\Env;
-use Pollen\Container\BaseServiceProvider;
+use Pollen\Container\BootableServiceProvider;
 
-class SessionServiceProvider extends BaseServiceProvider
+class SessionServiceProvider extends BootableServiceProvider
 {
     /**
      * @var string[]

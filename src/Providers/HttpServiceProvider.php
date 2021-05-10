@@ -7,9 +7,9 @@ namespace Pollen\Kernel\Providers;
 use Pollen\Http\Request;
 use Pollen\Http\RequestInterface;
 use Psr\Http\Message\ServerRequestInterface as PsrRequestInterface;
-use Pollen\Container\BaseServiceProvider;
+use Pollen\Container\BootableServiceProvider;
 
-class HttpServiceProvider extends BaseServiceProvider
+class HttpServiceProvider extends BootableServiceProvider
 {
     /**
      * @var string[]

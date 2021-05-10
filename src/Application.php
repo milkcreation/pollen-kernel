@@ -4,63 +4,64 @@ declare(strict_types=1);
 
 namespace Pollen\Kernel;
 
-use Exception;
+use Pollen\Config\ConfigInterface;
 use Pollen\Container\Container;
-use ReStatic\ProxyManager;
-use RuntimeException;
+use Pollen\Http\RequestInterface;
+use Pollen\Support\Concerns\BootableTrait;
+use Psr\Container\ContainerInterface;
 
-class Application extends Container
+/**
+ * @property-read ConfigInterface config
+ * @property-read RequestInterface request
+ */
+class Application extends Container implements ApplicationInterface
 {
+    use BootableTrait;
+
     /**
-     * Initialisation du conteneur d'injection de dépendances.
-     *
-     * @return void
+     * @var string[]
      */
-    public function bootContainer(): void
+    protected $aliases = [];
+
+    /**
+     * @var string
+     */
+    protected const  VERSION = '1.0.x-dev';
+
+    /**
+     * @inheritDoc
+     */
+    public function boot(): void { }
+
+    /**
+     * @inheritDoc
+     */
+    public function getVersion(): string
     {
-        $this->enableAutoWiring(true);
+        return static::VERSION;
+    }
 
-        $this->share('config', $this->config());
-
-        $this->serviceProviders = array_merge($this->config('service-providers', []), $this->serviceProviders);
-        $bootableServiceProviders = [];
-
-        foreach ($this->serviceProviders as $definition) {
-            if (is_string($definition)) {
-                try {
-                    $serviceProvider = new $definition();
-                } catch (Exception $e) {
-                    throw new RuntimeException(
-                        'ServiceProvider [%s] instanciation return exception :%s',
-                        $definition,
-                        $e->getMessage()
-                    );
-                }
-            } elseif (is_object($definition)) {
-                $serviceProvider = $definition;
-            } else {
-                throw new RuntimeException(
-                    'ServiceProvider [%s] type not supported',
-                    $definition
-                );
+    /**
+     * @inheritDoc
+     */
+    public function registerAliases(): void
+    {
+        foreach([
+            ApplicationInterface::class => [
+                'app',
+                Container::class,
+                ContainerInterface::class
+            ],
+            ConfigInterface::class => [
+                'config'
+            ],
+            RequestInterface::class => [
+                'request'
+            ]
+        ] as $key => $aliases) {
+            foreach ($aliases as $alias) {
+                $this->aliases[$alias] = $key;
             }
-
-            if (!$serviceProvider instanceof ServiceProviderInterface) {
-                throw new RuntimeException(
-                    'ServiceProvider [%s] must be an instance of %s',
-                    $definition,
-                    ServiceProviderInterface::class
-                );
-            }
-
-            $serviceProvider->setContainer($this);
-            $bootableServiceProviders[] = $serviceProvider;
-            $this->addServiceProvider($serviceProvider);
-        }
-
-        /** @var ServiceProviderInterface $serviceProvider */
-        foreach ($bootableServiceProviders as $serviceProvider) {
-            $serviceProvider->boot();
         }
     }
 
@@ -77,23 +78,10 @@ class Application extends Container
             return $_ENV['APP_RUNNING_IN_CONSOLE'] === 'true';
         }
 
-        if(isset($argv[0]) && preg_match('/vendor\/bin\/bee$/', $argv[0])) {
+        if (isset($argv[0]) && preg_match('/vendor\/bin\/bee$/', $argv[0])) {
             return true;
         }
 
         return isset($argv[0]) && ($argv[0] === 'console') && (PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg');
-    }
-
-    /**
-     *
-     */
-    public function registerProxy()
-    {
-        $manager = new ProxyManager($this);
-        foreach(config('app.proxy', []) as $alias => $proxy) {
-            $manager->addProxy($alias, $proxy);
-        }
-
-        $manager->enable(ProxyManager::ROOT_NAMESPACE_ANY);
     }
 }
