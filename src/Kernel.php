@@ -10,10 +10,10 @@ use Pollen\Config\Config;
 use Pollen\Config\ConfigInterface;
 use Pollen\Container\BootableServiceProviderInterface;
 use Pollen\Container\ServiceProviderInterface;
+use Pollen\Proxy\ProxyManager;
 use Pollen\Support\Concerns\BootableTrait;
 use Pollen\Support\Exception\ManagerRuntimeException;
 use Pollen\Support\ProxyResolver;
-use ReStatic\ProxyManager;
 use RuntimeException;
 
 class Kernel implements KernelInterface
