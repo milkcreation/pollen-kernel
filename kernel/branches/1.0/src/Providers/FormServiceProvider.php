@@ -6,9 +6,9 @@ namespace Pollen\Kernel\Providers;
 
 use Pollen\Form\FormManager;
 use Pollen\Form\FormManagerInterface;
-use Pollen\Container\BaseServiceProvider;
+use Pollen\Container\BootableServiceProvider;
 
-class FormServiceProvider extends BaseServiceProvider
+class FormServiceProvider extends BootableServiceProvider
 {
     /**
      * @var string[]

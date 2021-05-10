@@ -34,9 +34,9 @@ use Pollen\Field\Drivers\TextareaDriver;
 use Pollen\Field\Drivers\TextRemainingDriver;
 use Pollen\Field\Drivers\TinymceDriver;
 use Pollen\Field\Drivers\ToggleSwitchDriver;
-use Pollen\Container\BaseServiceProvider;
+use Pollen\Container\BootableServiceProvider;
 
-class FieldServiceProvider extends BaseServiceProvider
+class FieldServiceProvider extends BootableServiceProvider
 {
     /**
      * @var string[]

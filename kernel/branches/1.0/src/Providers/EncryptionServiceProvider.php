@@ -7,9 +7,9 @@ namespace Pollen\Kernel\Providers;
 use Pollen\Encryption\Encrypter;
 use Pollen\Encryption\EncrypterInterface;
 use Pollen\Support\Env;
-use Pollen\Container\BaseServiceProvider;
+use Pollen\Container\BootableServiceProvider;
 
-class EncryptionServiceProvider extends BaseServiceProvider
+class EncryptionServiceProvider extends BootableServiceProvider
 {
     /**
      * @var string[]

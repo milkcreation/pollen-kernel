@@ -10,9 +10,9 @@ use Pollen\Debug\DebugManagerInterface;
 use Pollen\Debug\ErrorHandlerInterface;
 use Pollen\Debug\PhpDebugBarDriver;
 use Pollen\Debug\WhoopsErrorHandler;
-use Pollen\Container\BaseServiceProvider;
+use Pollen\Container\BootableServiceProvider;
 
-class DebugServiceProvider extends BaseServiceProvider
+class DebugServiceProvider extends BootableServiceProvider
 {
     /**
      * @var string[]

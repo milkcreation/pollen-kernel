@@ -6,9 +6,9 @@ namespace Pollen\Kernel\Providers;
 
 use Pollen\Database\DatabaseManager;
 use Pollen\Database\DatabaseManagerInterface;
-use Pollen\Container\BaseServiceProvider;
+use Pollen\Container\BootableServiceProvider;
 
-class DatabaseServiceProvider extends BaseServiceProvider
+class DatabaseServiceProvider extends BootableServiceProvider
 {
     /**
      * @var string[]

@@ -7,9 +7,9 @@ namespace Pollen\Kernel\Providers;
 use Pollen\Cookie\CookieJar;
 use Pollen\Cookie\CookieJarInterface;
 use Pollen\Cookie\Middleware\QueuedCookiesMiddleware;
-use Pollen\Container\BaseServiceProvider;
+use Pollen\Container\BootableServiceProvider;
 
-class CookieServiceProvider extends BaseServiceProvider
+class CookieServiceProvider extends BootableServiceProvider
 {
     /**
      * @var string[]

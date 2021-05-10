@@ -6,9 +6,9 @@ namespace Pollen\Kernel\Providers;
 
 use Pollen\Filesystem\StorageManager;
 use Pollen\Filesystem\StorageManagerInterface;
-use Pollen\Container\BaseServiceProvider;
+use Pollen\Container\BootableServiceProvider;
 
-class FilesystemServiceProvider extends BaseServiceProvider
+class FilesystemServiceProvider extends BootableServiceProvider
 {
     /**
      * Liste des services fournis.

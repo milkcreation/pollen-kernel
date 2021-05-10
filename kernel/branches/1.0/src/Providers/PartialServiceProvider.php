@@ -26,9 +26,9 @@ use Pollen\Partial\Drivers\SliderDriver;
 use Pollen\Partial\Drivers\SpinnerDriver;
 use Pollen\Partial\Drivers\TabDriver;
 use Pollen\Partial\Drivers\TagDriver;
-use Pollen\Container\BaseServiceProvider;
+use Pollen\Container\BootableServiceProvider;
 
-class PartialServiceProvider extends BaseServiceProvider
+class PartialServiceProvider extends BootableServiceProvider
 {
     /**
      * @var string[]

@@ -13,10 +13,10 @@ use Pollen\Routing\Middleware\XhrMiddleware;
 use Pollen\Routing\Strategy\ApplicationStrategy;
 use Pollen\Routing\Strategy\JsonStrategy;
 use Laminas\Diactoros\ResponseFactory;
-use Pollen\Container\BaseServiceProvider;
+use Pollen\Container\BootableServiceProvider;
 use tiFy\Routing\Url;
 
-class RoutingServiceProvider extends BaseServiceProvider
+class RoutingServiceProvider extends BootableServiceProvider
 {
     protected $provides = [
         RouterInterface::class,
