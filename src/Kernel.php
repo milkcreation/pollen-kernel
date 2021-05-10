@@ -185,7 +185,7 @@ class Kernel implements KernelInterface
         ProxyResolver::setContainer($this->app);
 
         if (class_exists(ProxyManager::class)) {
-            $manager = new ProxyManager($this->app);
+            $manager = new ProxyManager([], $this->app);
             foreach ($this->config->get('proxy', []) as $alias => $proxy) {
                 $manager->addProxy($alias, $proxy);
             }
