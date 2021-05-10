@@ -4,15 +4,48 @@ declare(strict_types=1);
 
 namespace Pollen\Kernel;
 
+use Pollen\Asset\AssetManagerInterface;
 use Pollen\Config\ConfigInterface;
 use Pollen\Container\Container;
+use Pollen\Cookie\CookieJarInterface;
+use Pollen\Database\DatabaseManagerInterface;
+use Pollen\Debug\DebugManagerInterface;
+use Pollen\Encryption\EncrypterInterface;
+use Pollen\Event\EventDispatcherInterface;
+use Pollen\Field\FieldManagerInterface;
+use Pollen\Filesystem\StorageManagerInterface;
+use Pollen\Form\FormManagerInterface;
 use Pollen\Http\RequestInterface;
+use Pollen\Log\LogManagerInterface;
+use Pollen\Mail\MailManagerInterface;
+use Pollen\Partial\PartialManagerInterface;
+use Pollen\Proxy\Proxies\Database;
+use Pollen\Routing\RouterInterface;
+use Pollen\Session\SessionManagerInterface;
 use Pollen\Support\Concerns\BootableTrait;
+use Pollen\Validation\ValidatorInterface;
 use Psr\Container\ContainerInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 /**
+ * @property-read AssetManagerInterface asset
  * @property-read ConfigInterface config
+ * @property-read CookieJarInterface cookie
+ * @property-read EncrypterInterface crypt
+ * @property-read DatabaseManagerInterface database
+ * @property-read DebugManagerInterface debug
+ * @property-read EventDispatcherInterface event
+ * @property-read FieldManagerInterface field
+ * @property-read FormManagerInterface form
+ * @property-read LogManagerInterface log
+ * @property-read MailManagerInterface mail
+ * @property-read PartialManagerInterface partial
  * @property-read RequestInterface request
+ * @property-read RouterInterface router
+ * @property-read ServerRequestInterface psr_request
+ * @property-read SessionManagerInterface session
+ * @property-read StorageManagerInterface storage
+ * @property-read ValidatorInterface validator
  */
 class Application extends Container implements ApplicationInterface
 {
@@ -49,14 +82,64 @@ class Application extends Container implements ApplicationInterface
         foreach([
             ApplicationInterface::class => [
                 'app',
+                'container',
                 Container::class,
                 ContainerInterface::class
+            ],
+            AssetManagerInterface::class => [
+                'asset'
             ],
             ConfigInterface::class => [
                 'config'
             ],
+            CookieJarInterface::class => [
+                'cookie'
+            ],
+            DatabaseManagerInterface::class => [
+                'database',
+                'db'
+            ],
+            DebugManagerInterface::class => [
+                'debug'
+            ],
+            EncrypterInterface::class => [
+                'crypt'
+            ],
+            EventDispatcherInterface::class => [
+                'event'
+            ],
+            FieldManagerInterface::class => [
+                'field'
+            ],
+            FormManagerInterface::class => [
+                'form'
+            ],
+            LogManagerInterface::class => [
+                'log'
+            ],
+            MailManagerInterface::class => [
+                'mail'
+            ],
+            PartialManagerInterface::class => [
+                'partial'
+            ],
             RequestInterface::class => [
                 'request'
+            ],
+            RouterInterface::class => [
+                'router'
+            ],
+            ServerRequestInterface::class => [
+                 'psr_request'
+            ],
+            SessionManagerInterface::class => [
+                'session'
+            ],
+            StorageManagerInterface::class => [
+                'storage'
+            ],
+            ValidatorInterface::class => [
+                'validator'
             ]
         ] as $key => $aliases) {
             foreach ($aliases as $alias) {
