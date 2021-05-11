@@ -18,8 +18,8 @@ use Pollen\Form\FormManagerInterface;
 use Pollen\Http\RequestInterface;
 use Pollen\Log\LogManagerInterface;
 use Pollen\Mail\MailManagerInterface;
+use Pollen\Metabox\MetaboxManagerInterface;
 use Pollen\Partial\PartialManagerInterface;
-use Pollen\Proxy\Proxies\Database;
 use Pollen\Routing\RouterInterface;
 use Pollen\Session\SessionManagerInterface;
 use Pollen\Support\Concerns\BootableTrait;
@@ -39,6 +39,7 @@ use Psr\Http\Message\ServerRequestInterface;
  * @property-read FormManagerInterface form
  * @property-read LogManagerInterface log
  * @property-read MailManagerInterface mail
+ * @property-read MetaboxManagerInterface metabox
  * @property-read PartialManagerInterface partial
  * @property-read RequestInterface request
  * @property-read RouterInterface router
@@ -119,6 +120,9 @@ class Application extends Container implements ApplicationInterface
             ],
             MailManagerInterface::class => [
                 'mail'
+            ],
+            MetaboxManagerInterface::class => [
+                'metabox'
             ],
             PartialManagerInterface::class => [
                 'partial'

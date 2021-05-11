@@ -72,17 +72,13 @@ class Kernel implements KernelInterface
     public function boot(): void
     {
         if (!$this->isBooted()) {
-            /** @deprecaded */
-            if (defined('WP_INSTALLING') && (WP_INSTALLING === true)) {
-                return;
-            }
-
             $this->startTime = defined('START_TIME') ? START_TIME : microtime(true);
 
             $this->bootApp();
             $this->bootConfig();
             $this->bootProxies();
             $this->bootContainer();
+            $this->bootSession();
 
             $this->app->boot();
 
@@ -98,6 +94,10 @@ class Kernel implements KernelInterface
     protected function bootApp(): void
     {
         $this->app = class_exists(App::class) ? new App() : new Application();
+
+        if (!$this->app instanceof ApplicationInterface) {
+            throw new RuntimeException(sprintf('Application must be an instance of %s', ApplicationInterface::class));
+        }
     }
 
     /**
@@ -176,11 +176,11 @@ class Kernel implements KernelInterface
     }
 
     /**
-     * Déclaration des accesseurs (traits et static)
+     * Chargement des accesseurs.
      *
-     * @return static
+     * @return void
      */
-    public function bootProxies(): KernelInterface
+    protected function bootProxies(): void
     {
         ProxyResolver::setContainer($this->app);
 
@@ -192,15 +192,32 @@ class Kernel implements KernelInterface
 
             $manager->enable(ProxyManager::ROOT_NAMESPACE_ANY);
         }
+    }
 
-        return $this;
+    /**
+     * Chargement de la session.
+     *
+     * @return void
+     */
+    public function bootSession(): void
+    {
+        try {
+            $this->app->session->start();
+
+            $this->app->request->setSession($this->app->session->processor());
+        } catch (RuntimeException $e) {
+            unset($e);
+        }
     }
 
     /**
      * @inheritDoc
      */
-    public function getApp(): ?ApplicationInterface
+    public function getApp(): ApplicationInterface
     {
+        if (!$this->app instanceof ApplicationInterface) {
+            throw new RuntimeException('Unable to retrieve Application instance');
+        }
         return $this->app;
     }
 
