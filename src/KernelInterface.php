@@ -18,9 +18,9 @@ interface KernelInterface extends BootableTraitInterface
     /**
      * Récupération de l'instance de l'application.
      *
-     * @return ApplicationInterface|null
+     * @return ApplicationInterface
      */
-    public function getApp(): ?ApplicationInterface;
+    public function getApp(): ApplicationInterface;
 
     /**
      * Récupération de l'heure de démarrage.
