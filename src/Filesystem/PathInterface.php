@@ -78,13 +78,6 @@ interface PathInterface extends StorageManagerInterface
     public function diskTheme(): LocalFilesystemInterface;
 
     /**
-     * Récupération de l'instance du gestionnaire du dossier du framework PresstiFy.
-     *
-     * @return LocalFilesystemInterface
-     */
-    public function diskTiFy(): LocalFilesystemInterface;
-
-    /**
      * Récupération du chemin vers un dossier ou un fichier du répertoire de base (racine).
      *
      * @param string $path Chemin relatif vers un fichier ou un dossier du repertoire.
@@ -153,16 +146,6 @@ interface PathInterface extends StorageManagerInterface
      * @return string
      */
     public function getThemePath(string $path = '', bool $absolute = true): string;
-
-    /**
-     * Récupération du chemin vers un dossier ou un fichier du répertoire du framework presstiFy.
-     *
-     * @param string $path Chemin relatif vers un fichier ou un dossier du repertoire.
-     * @param bool $absolute Activation de la sortie du chemin en relatif.
-     *
-     * @return string
-     */
-    public function getTiFyPath(string $path = '', bool $absolute = true): string;
 
     /**
      * Vérification du type d'arborescence du projet.

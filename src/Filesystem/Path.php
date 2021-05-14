@@ -113,18 +113,6 @@ class Path extends StorageManager implements PathInterface
     /**
      * @inheritDoc
      */
-    public function diskTiFy(): LocalFilesystemInterface
-    {
-        if (!$disk = $this->disk('tify')) {
-            $disk = $this->mount('tify', $this->getBasePath('/vendor/presstify/framework/src'));
-        }
-
-        return $disk;
-    }
-
-    /**
-     * @inheritDoc
-     */
     public function getBasePath(string $path = '', bool $absolute = true): string
     {
 
@@ -177,14 +165,6 @@ class Path extends StorageManager implements PathInterface
     public function getThemePath(string $path = '', bool $absolute = true): string
     {
         return $this->diskPathFromBase($this->diskTheme(), $path, $absolute);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getTifyPath(string $path = '', bool $absolute = true): string
-    {
-        return $this->diskPathFromBase($this->diskTiFy(), $path, $absolute);
     }
 
     /**
