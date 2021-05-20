@@ -37,6 +37,11 @@ class Kernel implements KernelInterface
     protected $config;
 
     /**
+     * @var ServiceProviderInterface[]|array
+     */
+    protected $bootableProviders;
+
+    /**
      * @var int
      */
     protected $startTime;
@@ -76,8 +81,9 @@ class Kernel implements KernelInterface
 
             $this->bootApp();
             $this->bootConfig();
-            $this->bootProxies();
             $this->bootContainer();
+            $this->bootProxies();
+            $this->bootServices();
             $this->bootSession();
 
             $this->app->boot();
@@ -132,7 +138,6 @@ class Kernel implements KernelInterface
         $this->app->registerAliases();
 
         $serviceProviders = $this->config->get('app.providers', []);
-        $bootableServiceProviders = [];
 
         foreach ($serviceProviders as $definition) {
             if (is_string($definition)) {
@@ -164,14 +169,9 @@ class Kernel implements KernelInterface
 
             $serviceProvider->setContainer($this->app);
             if ($serviceProvider instanceof BootableServiceProviderInterface) {
-                $bootableServiceProviders[] = $serviceProvider;
+                $this->bootableProviders[] = $serviceProvider;
             }
             $this->app->addServiceProvider($serviceProvider);
-        }
-
-        /** @var BootableServiceProviderInterface $bootableServiceProvider */
-        foreach ($bootableServiceProviders as $bootableServiceProvider) {
-            $bootableServiceProvider->boot();
         }
     }
 
@@ -195,11 +195,23 @@ class Kernel implements KernelInterface
     }
 
     /**
+     * Chargement des fournisseurs de services.
+     *
+     * @return void
+     */
+    protected function bootServices(): void
+    {
+        foreach ($this->bootableProviders as $bootableProvider) {
+            $bootableProvider->boot();
+        }
+    }
+
+    /**
      * Chargement de la session.
      *
      * @return void
      */
-    public function bootSession(): void
+    protected function bootSession(): void
     {
         try {
             $this->app->session->start();
