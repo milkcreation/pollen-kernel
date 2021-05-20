@@ -25,10 +25,32 @@
   "require": {
     "php": ">=7.4",
     "composer/installers": "~1.0",
-    "pollen-solutions/support": "^1.0"
+    "pollen-solutions/asset": "^1.0",
+    "pollen-solutions/config": "^1.0",
+    "pollen-solutions/container": "^1.0",
+    "pollen-solutions/cookie": "^1.0",
+    "pollen-solutions/database": "^1.0",
+    "pollen-solutions/debug": "^1.0",
+    "pollen-solutions/encryption": "^1.0",
+    "pollen-solutions/event": "^1.0",
+    "pollen-solutions/field": "^1.0",
+    "pollen-solutions/filesystem": "^1.0",
+    "pollen-solutions/form": "^1.0",
+    "pollen-solutions/http": "^1.0",
+    "pollen-solutions/log": "^1.0",
+    "pollen-solutions/mail": "^1.0",
+    "pollen-solutions/metabox": "^1.0",
+    "pollen-solutions/partial": "^1.0",
+    "pollen-solutions/proxy": "^1.0",
+    "pollen-solutions/routing": "^1.0",
+    "pollen-solutions/session": "^1.0",
+    "pollen-solutions/support": "^1.0",
+    "pollen-solutions/validation": "^1.0",
+    "pollen-solutions/view": "^1.0"
   },
   "require-dev": {
-    "phpunit/phpunit": "^9.0"
+    "phpunit/phpunit": "^9.0",
+    "roave/security-advisories": "dev-latest"
   },
   "autoload": {
     "psr-4": {
