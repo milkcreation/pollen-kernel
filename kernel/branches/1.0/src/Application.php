@@ -22,7 +22,7 @@ use Pollen\Metabox\MetaboxManagerInterface;
 use Pollen\Partial\PartialManagerInterface;
 use Pollen\Routing\RouterInterface;
 use Pollen\Session\SessionManagerInterface;
-use Pollen\Support\Concerns\BootableTrait;
+use Pollen\Support\Exception\ManagerRuntimeException;
 use Pollen\Validation\ValidatorInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -50,10 +50,14 @@ use Psr\Http\Message\ServerRequestInterface;
  */
 class Application extends Container implements ApplicationInterface
 {
-    use BootableTrait;
+    /**
+     * Instance partagée.
+     * @var static|null
+     */
+    private static $instance;
 
     /**
-     * @var string[]
+     * @var string[][]
      */
     protected $aliases = [];
 
@@ -61,6 +65,31 @@ class Application extends Container implements ApplicationInterface
      * @var string
      */
     protected const  VERSION = '1.0.x-dev';
+
+    /**
+     * @return void
+     */
+    public function __construct()
+    {
+        if (!self::$instance instanceof static) {
+            self::$instance = $this;
+        }
+
+        parent::__construct();
+    }
+
+    /**
+     * Récupération de l'instance principale.
+     *
+     * @return static
+     */
+    public static function getInstance(): ApplicationInterface
+    {
+        if (self::$instance instanceof self) {
+            return self::$instance;
+        }
+        throw new ManagerRuntimeException(sprintf('Unavailable [%s] instance', __CLASS__));
+    }
 
     /**
      * @inheritDoc
