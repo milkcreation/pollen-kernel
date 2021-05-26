@@ -33,6 +33,7 @@ use Psr\Http\Message\ServerRequestInterface;
  * @property-read CookieJarInterface cookie
  * @property-read EncrypterInterface crypt
  * @property-read DatabaseManagerInterface database
+ * @property-read DatabaseManagerInterface db
  * @property-read DebugManagerInterface debug
  * @property-read EventDispatcherInterface event
  * @property-read FieldManagerInterface field
