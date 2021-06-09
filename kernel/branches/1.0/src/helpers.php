@@ -2,7 +2,7 @@
 
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Pollen\Asset\AssetManagerInterface;
-use Pollen\Config\ConfigInterface;
+use Pollen\Config\ConfiguratorInterface;
 use Pollen\Database\DatabaseManagerInterface;
 use Pollen\Event\EventDispatcherInterface;
 use Pollen\Field\FieldDriverInterface;
@@ -65,12 +65,12 @@ if (!function_exists('config')) {
      * @param null|array|string $key
      * @param mixed $default
      *
-     * @return ConfigInterface|mixed
+     * @return ConfiguratorInterface|mixed
      */
     function config($key = null, $default = null)
     {
-        /* @var ConfigInterface $config */
-        $config = app(ConfigInterface::class);
+        /* @var ConfiguratorInterface $config */
+        $config = app(ConfiguratorInterface::class);
 
         if (is_null($key)) {
             return $config;

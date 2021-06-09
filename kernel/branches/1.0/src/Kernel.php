@@ -6,8 +6,8 @@ namespace Pollen\Kernel;
 
 use App\App;
 use Exception;
-use Pollen\Config\Config;
-use Pollen\Config\ConfigInterface;
+use Pollen\Config\Configurator;
+use Pollen\Config\ConfiguratorInterface;
 use Pollen\Container\BootableServiceProviderInterface;
 use Pollen\Container\ServiceProviderInterface;
 use Pollen\Proxy\ProxyManager;
@@ -32,12 +32,12 @@ class Kernel implements KernelInterface
     protected $app;
 
     /**
-     * @var ConfigInterface
+     * @var string|null
      */
-    protected $config;
+    protected $configDir;
 
     /**
-     * @var ServiceProviderInterface[]|array
+     * @var BootableServiceProviderInterface[]|array
      */
     protected $bootableProviders;
 
@@ -51,7 +51,7 @@ class Kernel implements KernelInterface
      */
     public function __construct(?string $configDir = null)
     {
-        $this->config = ($configDir !== null) ? new Config($configDir) : new Config('');
+        $this->configDir = $configDir;
 
         if (!self::$instance instanceof static) {
             self::$instance = $this;
@@ -113,16 +113,18 @@ class Kernel implements KernelInterface
      */
     protected function bootConfig(): void
     {
-        $this->config->setContainer($this->app);
-        $this->app->share(ConfigInterface::class, $this->config);
+        $configurator = new Configurator($this->configDir);
 
-        $tz = $this->config->get('timezone') ?: $this->app->request->server->get(
+        $configurator->setContainer($this->app);
+        $this->app->share(ConfiguratorInterface::class, $configurator);
+
+        $tz = $configurator->get('timezone') ?: $this->app->request->server->get(
             'TZ',
             ini_get('date.timezone') ?: 'UTC'
         );
         date_default_timezone_set($tz);
 
-        mb_internal_encoding($this->config->get('charset', 'UTF-8'));
+        mb_internal_encoding($configurator->get('charset', 'UTF-8'));
     }
 
     /**
@@ -137,7 +139,7 @@ class Kernel implements KernelInterface
 
         $this->app->registerAliases();
 
-        $serviceProviders = $this->config->get('app.providers', []);
+        $serviceProviders = $this->app->config->get('app.providers', []);
 
         foreach ($serviceProviders as $definition) {
             if (is_string($definition)) {
@@ -186,7 +188,7 @@ class Kernel implements KernelInterface
 
         if (class_exists(ProxyManager::class)) {
             $manager = new ProxyManager([], $this->app);
-            foreach ($this->config->get('proxy', []) as $alias => $proxy) {
+            foreach ($this->app->config->get('proxy', []) as $alias => $proxy) {
                 $manager->addProxy($alias, $proxy);
             }
 

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Pollen\Kernel;
 
 use Pollen\Asset\AssetManagerInterface;
-use Pollen\Config\ConfigInterface;
+use Pollen\Config\ConfiguratorInterface;
 use Pollen\Container\Container;
 use Pollen\Cookie\CookieJarInterface;
 use Pollen\Database\DatabaseManagerInterface;
@@ -29,7 +29,7 @@ use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * @property-read AssetManagerInterface asset
- * @property-read ConfigInterface config
+ * @property-read ConfiguratorInterface config
  * @property-read CookieJarInterface cookie
  * @property-read EncrypterInterface crypt
  * @property-read DatabaseManagerInterface database
@@ -60,7 +60,7 @@ class Application extends Container implements ApplicationInterface
     /**
      * @var string[][]
      */
-    protected $aliases = [];
+    protected $aliases;
 
     /**
      * @var string
@@ -120,7 +120,7 @@ class Application extends Container implements ApplicationInterface
             AssetManagerInterface::class => [
                 'asset'
             ],
-            ConfigInterface::class => [
+            ConfiguratorInterface::class => [
                 'config'
             ],
             CookieJarInterface::class => [
