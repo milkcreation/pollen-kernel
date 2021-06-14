@@ -7,6 +7,7 @@ namespace Pollen\Kernel;
 use Pollen\Asset\AssetManagerInterface;
 use Pollen\Config\ConfiguratorInterface;
 use Pollen\Container\Container;
+use Pollen\Container\ServiceProviderInterface;
 use Pollen\Cookie\CookieJarInterface;
 use Pollen\Database\DatabaseManagerInterface;
 use Pollen\Debug\DebugManagerInterface;
@@ -58,9 +59,10 @@ class Application extends Container implements ApplicationInterface
     private static $instance;
 
     /**
-     * @var string[][]
+     * Liste des fournisseurs de service déclarés
+     * @var ServiceProviderInterface[]
      */
-    protected $aliases;
+    protected $serviceProviders = [];
 
     /**
      * @var string
@@ -100,6 +102,14 @@ class Application extends Container implements ApplicationInterface
     /**
      * @inheritDoc
      */
+    public function getServiceProviders(): array
+    {
+        return $this->serviceProviders;
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function getVersion(): string
     {
         return static::VERSION;
@@ -110,72 +120,77 @@ class Application extends Container implements ApplicationInterface
      */
     public function registerAliases(): void
     {
-        foreach([
-            ApplicationInterface::class => [
-                'app',
-                'container',
-                Container::class,
-                ContainerInterface::class
-            ],
-            AssetManagerInterface::class => [
-                'asset'
-            ],
-            ConfiguratorInterface::class => [
-                'config'
-            ],
-            CookieJarInterface::class => [
-                'cookie'
-            ],
-            DatabaseManagerInterface::class => [
-                'database',
-                'db'
-            ],
-            DebugManagerInterface::class => [
-                'debug'
-            ],
-            EncrypterInterface::class => [
-                'crypt'
-            ],
-            EventDispatcherInterface::class => [
-                'event'
-            ],
-            FieldManagerInterface::class => [
-                'field'
-            ],
-            FormManagerInterface::class => [
-                'form'
-            ],
-            LogManagerInterface::class => [
-                'log'
-            ],
-            MailManagerInterface::class => [
-                'mail'
-            ],
-            MetaboxManagerInterface::class => [
-                'metabox'
-            ],
-            PartialManagerInterface::class => [
-                'partial'
-            ],
-            RequestInterface::class => [
-                'request'
-            ],
-            RouterInterface::class => [
-                'router'
-            ],
-            ServerRequestInterface::class => [
-                 'psr_request'
-            ],
-            SessionManagerInterface::class => [
-                'session'
-            ],
-            StorageManagerInterface::class => [
-                'storage'
-            ],
-            ValidatorInterface::class => [
-                'validator'
-            ]
-        ] as $key => $aliases) {
+        foreach (
+            [
+                ApplicationInterface::class     => [
+                    'app',
+                    'container',
+                    Container::class,
+                    ContainerInterface::class,
+                ],
+                AssetManagerInterface::class    => [
+                    'asset',
+                ],
+                ConfiguratorInterface::class    => [
+                    'config',
+                ],
+                CookieJarInterface::class       => [
+                    'cookie',
+                ],
+                DatabaseManagerInterface::class => [
+                    'database',
+                    'db',
+                ],
+                DebugManagerInterface::class    => [
+                    'debug',
+                ],
+                EncrypterInterface::class       => [
+                    'crypt',
+                ],
+                EventDispatcherInterface::class => [
+                    'event',
+                ],
+                FieldManagerInterface::class    => [
+                    'field',
+                ],
+                FormManagerInterface::class     => [
+                    'form',
+                ],
+                KernelInterface::class          => [
+                    'kernel',
+                ],
+                LogManagerInterface::class      => [
+                    'log',
+                ],
+                MailManagerInterface::class     => [
+                    'mail',
+                ],
+                MetaboxManagerInterface::class  => [
+                    'metabox',
+                ],
+                PartialManagerInterface::class  => [
+                    'partial',
+                ],
+                RequestInterface::class         => [
+                    'request',
+                ],
+                RouterInterface::class          => [
+                    'router',
+                ],
+                ServerRequestInterface::class   => [
+                    'psr_request',
+                ],
+                SessionManagerInterface::class  => [
+                    'session',
+                ],
+                StorageManagerInterface::class  => [
+                    'storage',
+                ],
+                ValidatorInterface::class       => [
+                    'validator',
+                ],
+            ] as $key => $aliases
+        ) {
             foreach ($aliases as $alias) {
                 $this->aliases[$alias] = $key;
             }

@@ -6,15 +6,19 @@ namespace Pollen\Kernel;
 
 use App\App;
 use Exception;
+use Nette\Schema\Expect;
+use Nette\Schema\Elements\Type;
 use Pollen\Config\Configurator;
 use Pollen\Config\ConfiguratorInterface;
 use Pollen\Container\BootableServiceProviderInterface;
 use Pollen\Container\ServiceProviderInterface;
 use Pollen\Proxy\ProxyManager;
 use Pollen\Support\Concerns\BootableTrait;
+use Pollen\Support\Env;
 use Pollen\Support\Exception\ManagerRuntimeException;
 use Pollen\Support\ProxyResolver;
 use RuntimeException;
+use Throwable;
 
 class Kernel implements KernelInterface
 {
@@ -32,27 +36,22 @@ class Kernel implements KernelInterface
     protected $app;
 
     /**
-     * @var string|null
+     * @var array
      */
-    protected $configDir;
+    protected $config = [];
 
     /**
      * @var BootableServiceProviderInterface[]|array
      */
-    protected $bootableProviders;
+    protected $bootableProviders = [];
 
     /**
      * @var int
      */
     protected $startTime;
 
-    /**
-     * @param string|null $configDir
-     */
-    public function __construct(?string $configDir = null)
+    public function __construct()
     {
-        $this->configDir = $configDir;
-
         if (!self::$instance instanceof static) {
             self::$instance = $this;
         }
@@ -104,6 +103,8 @@ class Kernel implements KernelInterface
         if (!$this->app instanceof ApplicationInterface) {
             throw new RuntimeException(sprintf('Application must be an instance of %s', ApplicationInterface::class));
         }
+
+        $this->app->share(KernelInterface::class, $this);
     }
 
     /**
@@ -113,16 +114,27 @@ class Kernel implements KernelInterface
      */
     protected function bootConfig(): void
     {
-        $configurator = new Configurator($this->configDir);
+        $this->app->share(ConfiguratorInterface::class, $configurator = new Configurator());
 
-        $configurator->setContainer($this->app);
-        $this->app->share(ConfiguratorInterface::class, $configurator);
+        $configurator->addSchema('app_url', Expect::string());
+        $configurator->addSchema('timezone', Expect::string());
 
-        $tz = $configurator->get('timezone') ?: $this->app->request->server->get(
-            'TZ',
-            ini_get('date.timezone') ?: 'UTC'
+        $configurator->set('truc', 'machin');
+        /** @todo Depuis le framework */
+        $configurator->set(
+            array_merge(
+                [
+                    'app_url'  => Env::get('APP_URL'),
+                    'timezone' => Env::get('APP_TIMEZONE'),
+                ],
+                $this->config
+            )
         );
-        date_default_timezone_set($tz);
+
+
+        if ($tz = $configurator->get('timezone', ini_get('date.timezone'))) {
+            date_default_timezone_set($tz);
+        }
 
         mb_internal_encoding($configurator->get('charset', 'UTF-8'));
     }
@@ -139,9 +151,7 @@ class Kernel implements KernelInterface
 
         $this->app->registerAliases();
 
-        $serviceProviders = $this->app->config->get('app.providers', []);
-
-        foreach ($serviceProviders as $definition) {
+        foreach ($this->app->getServiceProviders() as $definition) {
             if (is_string($definition)) {
                 try {
                     $serviceProvider = new $definition();
@@ -219,7 +229,7 @@ class Kernel implements KernelInterface
             $this->app->session->start();
 
             $this->app->request->setSession($this->app->session->processor());
-        } catch (RuntimeException $e) {
+        } catch (Throwable $e) {
             unset($e);
         }
     }
@@ -241,5 +251,15 @@ class Kernel implements KernelInterface
     public function getStartTime(): ?float
     {
         return $this->startTime;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setConfig(array $config): KernelInterface
+    {
+        $this->config = $config;
+
+        return $this;
     }
 }

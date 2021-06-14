@@ -28,4 +28,13 @@ interface KernelInterface extends BootableTraitInterface
      * @return float|null
      */
     public function getStartTime(): ?float;
+
+    /**
+     * Définition des paramètres de configuration.
+     *
+     * @param array $config
+     *
+     * @return static
+     */
+    public function setConfig(array $config): KernelInterface;
 }

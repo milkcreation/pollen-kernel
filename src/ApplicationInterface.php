@@ -7,6 +7,7 @@ namespace Pollen\Kernel;
 use Pollen\Asset\AssetManagerInterface;
 use Pollen\Config\ConfiguratorInterface;
 use Pollen\Container\ContainerInterface;
+use Pollen\Container\ServiceProviderInterface;
 use Pollen\Cookie\CookieJarInterface;
 use Pollen\Database\DatabaseManagerInterface;
 use Pollen\Debug\DebugManagerInterface;
@@ -55,6 +56,13 @@ interface ApplicationInterface extends ContainerInterface
      * @return void
      */
     public function boot(): void;
+
+    /**
+     * Récupération de la liste des fournisseurs de service.
+     *
+     * @return ServiceProviderInterface[]|array
+     */
+    public function getServiceProviders(): array;
 
     /**
      * Récupération du numéro de version de l'application.
