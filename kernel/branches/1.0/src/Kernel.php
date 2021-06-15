@@ -7,7 +7,6 @@ namespace Pollen\Kernel;
 use App\App;
 use Exception;
 use Nette\Schema\Expect;
-use Nette\Schema\Elements\Type;
 use Pollen\Config\Configurator;
 use Pollen\Config\ConfiguratorInterface;
 use Pollen\Container\BootableServiceProviderInterface;
@@ -130,7 +129,6 @@ class Kernel implements KernelInterface
                 $this->config
             )
         );
-
 
         if ($tz = $configurator->get('timezone', ini_get('date.timezone'))) {
             date_default_timezone_set($tz);
