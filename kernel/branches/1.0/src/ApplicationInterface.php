@@ -59,6 +59,13 @@ interface ApplicationInterface extends BuildableTraitInterface, ContainerInterfa
     public function boot(): void;
 
     /**
+     * Initialisation.
+     *
+     * @return ApplicationInterface
+     */
+    public function build(): ApplicationInterface;
+
+    /**
      * Récupération du chemin absolue vers la racine du projet.
      *
      * @return string
@@ -92,4 +99,13 @@ interface ApplicationInterface extends BuildableTraitInterface, ContainerInterfa
      * @return boolean
      */
     public function runningInConsole(): bool;
+
+    /**
+     * Définition des paramètres de configuration.
+     *
+     * @param array $configParams
+     *
+     * @return static
+     */
+    public function setConfigParams(array $configParams): ApplicationInterface;
 }
