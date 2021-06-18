@@ -4,17 +4,25 @@ declare(strict_types=1);
 
 namespace Pollen\Kernel;
 
+use Pollen\Http\RequestInterface;
+use Pollen\Http\ResponseInterface;
+use Pollen\Routing\Router;
 use Pollen\Support\Exception\ManagerRuntimeException;
+use Pollen\Routing\RouterInterface;
 use RuntimeException;
+use Throwable;
 
 class Kernel implements KernelInterface
 {
-
     /**
-     * Instance principale.
      * @var static|null
      */
     private static $instance;
+
+    /**
+     * @var RouterInterface
+     */
+    protected $router;
 
     /**
      * @var ApplicationInterface
@@ -52,5 +60,43 @@ class Kernel implements KernelInterface
             throw new RuntimeException('Unable to retrieve Application instance');
         }
         return $this->app;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function handle(RequestInterface $request): ResponseInterface
+    {
+        if (!$this->app->isBuilt()) {
+            $this->app->build();
+        }
+
+        if (! $this->app->has(RouterInterface::class)) {
+            try {
+                $this->app->share(RouterInterface::class, new Router([], $this->app));
+            } catch(Throwable $e) {
+
+            }
+        }
+
+        $this->router = $this->app->router;
+
+        return $this->router->setHandleRequest($request)->handleRequest();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function send(ResponseInterface $response): bool
+    {
+        return $this->router->sendResponse($response);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function terminate(RequestInterface $request, ResponseInterface $response): void
+    {
+       $this->router->terminateEvent($request, $response);
     }
 }

@@ -12,8 +12,7 @@
   "authors": [
     {
       "name": "Jordy Manner",
-      "email": "jordy@presstify.com",
-      "role": "Developper"
+      "email": "jordy@presstify.com"
     }
   ],
   "repositories": [
@@ -28,6 +27,8 @@
     "pollen-solutions/config": "^1.0",
     "pollen-solutions/container": "^1.0",
     "pollen-solutions/event": "^1.0",
+    "pollen-solutions/http": "^1.0",
+    "pollen-solutions/routing": "^1.0",
     "pollen-solutions/support": "^1.0"
   },
   "require-dev": {
