@@ -131,7 +131,7 @@ class Application extends Container implements ApplicationInterface
         if (!$this->isBuilt()) {
             $this->envLoad();
 
-            $this->publicDir = Env::get('APP_PUBLIC', 'public');
+            $this->publicDir = Env::get('APP_PUBLIC_DIR', 'public');
             $this->publicPath = fs::normalizePath($this->basePath . fs::DS . $this->publicDir);
 
             $this->share(KernelInterface::class, new Kernel($this));
