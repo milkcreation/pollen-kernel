@@ -6,8 +6,12 @@ namespace Pollen\Kernel;
 
 use Dotenv\Dotenv;
 use Dotenv\Exception\InvalidPathException;
+use Exception;
+use Nette\Schema\Expect;
 use Pollen\Asset\AssetManagerInterface;
+use Pollen\Config\Configurator;
 use Pollen\Config\ConfiguratorInterface;
+use Pollen\Container\BootableServiceProviderInterface;
 use Pollen\Container\Container;
 use Pollen\Container\ServiceProviderInterface;
 use Pollen\Cookie\CookieJarInterface;
@@ -29,9 +33,12 @@ use Pollen\Support\Concerns\BuildableTrait;
 use Pollen\Support\Env;
 use Pollen\Support\Exception\ManagerRuntimeException;
 use Pollen\Support\Filesystem as fs;
+use Pollen\Support\ProxyResolver;
 use Pollen\Validation\ValidatorInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use RuntimeException;
+use Throwable;
 
 /**
  * @property-read AssetManagerInterface asset
@@ -61,9 +68,24 @@ class Application extends Container implements ApplicationInterface
     use BuildableTrait;
 
     /**
+     * @var static|null
+     */
+    private static $instance;
+
+    /**
+     * @var string
+     */
+    protected const  VERSION = '1.0.x-dev';
+
+    /**
      * @var string
      */
     protected $basePath;
+
+    /**
+     * @var array
+     */
+    protected $configParams = [];
 
     /**
      * @var string
@@ -76,21 +98,24 @@ class Application extends Container implements ApplicationInterface
     protected $publicPath;
 
     /**
-     * Instance partagée.
-     * @var static|null
+     * @var bool
      */
-    private static $instance;
+    protected $preBuilt = false;
 
     /**
-     * Liste des fournisseurs de service déclarés
+     * @var int
+     */
+    protected $startTime;
+
+    /**
      * @var ServiceProviderInterface[]
      */
     protected $serviceProviders = [];
 
     /**
-     * @var string
+     * @var BootableServiceProviderInterface[]|array
      */
-    protected const  VERSION = '1.0.x-dev';
+    protected $bootableProviders = [];
 
     /**
      * @return void
@@ -105,7 +130,7 @@ class Application extends Container implements ApplicationInterface
 
         parent::__construct();
 
-        $this->build();
+        $this->preBuild();
     }
 
     /**
@@ -122,21 +147,178 @@ class Application extends Container implements ApplicationInterface
     }
 
     /**
-     * Initialisation.
+     * Pré-initialisation.
      *
      * @return void
      */
-    protected function build(): void
+    protected function preBuild(): void
     {
-        if (!$this->isBuilt()) {
+        if ($this->preBuilt === false) {
+            $this->startTime = defined('START_TIME') ? START_TIME : microtime(true);
+
             $this->envLoad();
 
             $this->publicDir = Env::get('APP_PUBLIC_DIR', 'public');
             $this->publicPath = fs::normalizePath($this->basePath . fs::DS . $this->publicDir);
 
+            $this->preBuildKernel();
+
+            $this->preBuilt = true;
+        }
+    }
+
+    /**
+     * Pré-Initialisation du kernel.
+     *
+     * @return void
+     */
+    protected function preBuildKernel(): void
+    {
+        if (!$this->has(KernelInterface::class)) {
             $this->share(KernelInterface::class, new Kernel($this));
+        }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function build(): ApplicationInterface
+    {
+        if (!$this->isBuilt()) {
+            $this->buildConfig();
+            $this->buildContainer();
+            $this->buildProxies();
+            $this->buildServices();
+            $this->buildSession();
 
             $this->setBuilt();
+        }
+
+        return $this;
+    }
+
+    /**
+     * Chargement de la configuration.
+     *
+     * @return void
+     */
+    protected function buildConfig(): void
+    {
+        $this->share(ConfiguratorInterface::class, $configurator = new Configurator());
+
+        $configurator->addSchema('app_url', Expect::string());
+        $configurator->addSchema('timezone', Expect::string());
+
+        /** @todo Depuis le framework */
+        $configurator->set(
+            array_merge(
+                [
+                    'app_url'  => Env::get('APP_URL'),
+                    'timezone' => Env::get('APP_TIMEZONE'),
+                ],
+                $this->configParams
+            )
+        );
+
+        if ($tz = $configurator->get('timezone', ini_get('date.timezone'))) {
+            date_default_timezone_set($tz);
+        }
+
+        mb_internal_encoding($configurator->get('charset', 'UTF-8'));
+    }
+
+    /**
+     * Chargement du conteneur d'injection de dépendances.
+     *
+     * @return void
+     */
+    protected function buildContainer(): void
+    {
+        $this->enableAutoWiring(true);
+        $this->share(ApplicationInterface::class, $this);
+
+        $this->registerAliases();
+
+        foreach ($this->getServiceProviders() as $definition) {
+            if (is_string($definition)) {
+                try {
+                    $serviceProvider = new $definition();
+                } catch (Exception $e) {
+                    throw new RuntimeException(
+                        'ServiceProvider [%s] instanciation return exception :%s',
+                        $definition,
+                        $e->getMessage()
+                    );
+                }
+            } elseif (is_object($definition)) {
+                $serviceProvider = $definition;
+            } else {
+                throw new RuntimeException(
+                    'ServiceProvider [%s] type not supported',
+                    $definition
+                );
+            }
+
+            if (!$serviceProvider instanceof ServiceProviderInterface) {
+                throw new RuntimeException(
+                    'ServiceProvider [%s] must be an instance of %s',
+                    $definition,
+                    ServiceProviderInterface::class
+                );
+            }
+
+            $serviceProvider->setContainer($this);
+            if ($serviceProvider instanceof BootableServiceProviderInterface) {
+                $this->bootableProviders[] = $serviceProvider;
+            }
+            $this->addServiceProvider($serviceProvider);
+        }
+    }
+
+    /**
+     * Initialisation des accesseurs.
+     *
+     * @return void
+     */
+    protected function buildProxies(): void
+    {
+        ProxyResolver::setContainer($this);
+
+        if (class_exists(ProxyManager::class)) {
+            $manager = new ProxyManager([], $this);
+            foreach ($this->config->get('proxy', []) as $alias => $proxy) {
+                $manager->addProxy($alias, $proxy);
+            }
+
+            $manager->enable(ProxyManager::ROOT_NAMESPACE_ANY);
+        }
+    }
+
+    /**
+     * Chargement des fournisseurs de services.
+     *
+     * @return void
+     */
+    protected function buildServices(): void
+    {
+        foreach ($this->bootableProviders as $bootableProvider) {
+            $bootableProvider->boot();
+        }
+    }
+
+    /**
+     * Chargement de la session.
+     *
+     * @return void
+     */
+    protected function buildSession(): void
+    {
+        try {
+            $this->session->start();
+
+            $this->request->setSession($this->session->processor());
+        } catch (Throwable $e) {
+            unset($e);
         }
     }
 
@@ -284,5 +466,15 @@ class Application extends Container implements ApplicationInterface
         }
 
         return isset($argv[0]) && ($argv[0] === 'console') && (PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg');
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setConfigParams(array $configParams): ApplicationInterface
+    {
+        $this->configParams = $configParams;
+
+        return $this;
     }
 }
