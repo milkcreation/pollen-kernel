@@ -23,6 +23,7 @@ use Pollen\Metabox\MetaboxManagerInterface;
 use Pollen\Partial\PartialManagerInterface;
 use Pollen\Routing\RouterInterface;
 use Pollen\Session\SessionManagerInterface;
+use Pollen\Support\Concerns\BuildableTraitInterface;
 use Pollen\Validation\ValidatorInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -48,7 +49,7 @@ use Psr\Http\Message\ServerRequestInterface;
  * @property-read StorageManagerInterface storage
  * @property-read ValidatorInterface validator
  */
-interface ApplicationInterface extends ContainerInterface
+interface ApplicationInterface extends BuildableTraitInterface, ContainerInterface
 {
     /**
      * Chargement.
@@ -56,6 +57,13 @@ interface ApplicationInterface extends ContainerInterface
      * @return void
      */
     public function boot(): void;
+
+    /**
+     * Récupération du chemin absolue vers la racine du projet.
+     *
+     * @return string
+     */
+    public function getBasePath(): string;
 
     /**
      * Récupération de la liste des fournisseurs de service.

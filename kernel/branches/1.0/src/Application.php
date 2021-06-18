@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Pollen\Kernel;
 
+use Dotenv\Dotenv;
+use Dotenv\Exception\InvalidPathException;
 use Pollen\Asset\AssetManagerInterface;
 use Pollen\Config\ConfiguratorInterface;
 use Pollen\Container\Container;
@@ -23,7 +25,10 @@ use Pollen\Metabox\MetaboxManagerInterface;
 use Pollen\Partial\PartialManagerInterface;
 use Pollen\Routing\RouterInterface;
 use Pollen\Session\SessionManagerInterface;
+use Pollen\Support\Concerns\BuildableTrait;
+use Pollen\Support\Env;
 use Pollen\Support\Exception\ManagerRuntimeException;
+use Pollen\Support\Filesystem as fs;
 use Pollen\Validation\ValidatorInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -39,6 +44,7 @@ use Psr\Http\Message\ServerRequestInterface;
  * @property-read EventDispatcherInterface event
  * @property-read FieldManagerInterface field
  * @property-read FormManagerInterface form
+ * @property-read KernelInterface kernel
  * @property-read LogManagerInterface log
  * @property-read MailManagerInterface mail
  * @property-read MetaboxManagerInterface metabox
@@ -52,6 +58,23 @@ use Psr\Http\Message\ServerRequestInterface;
  */
 class Application extends Container implements ApplicationInterface
 {
+    use BuildableTrait;
+
+    /**
+     * @var string
+     */
+    protected $basePath;
+
+    /**
+     * @var string
+     */
+    protected $publicDir;
+
+    /**
+     * @var string
+     */
+    protected $publicPath;
+
     /**
      * Instance partagée.
      * @var static|null
@@ -72,13 +95,17 @@ class Application extends Container implements ApplicationInterface
     /**
      * @return void
      */
-    public function __construct()
+    public function __construct(string $basePath)
     {
+        $this->basePath = fs::normalizePath($basePath);
+
         if (!self::$instance instanceof static) {
             self::$instance = $this;
         }
 
         parent::__construct();
+
+        $this->build();
     }
 
     /**
@@ -95,9 +122,51 @@ class Application extends Container implements ApplicationInterface
     }
 
     /**
+     * Initialisation.
+     *
+     * @return void
+     */
+    protected function build(): void
+    {
+        if (!$this->isBuilt()) {
+            $this->envLoad();
+
+            $this->publicDir = Env::get('APP_PUBLIC', 'public');
+            $this->publicPath = fs::normalizePath($this->basePath . fs::DS . $this->publicDir);
+
+            $this->share(KernelInterface::class, new Kernel($this));
+
+            $this->setBuilt();
+        }
+    }
+
+    /**
      * @inheritDoc
      */
     public function boot(): void { }
+
+    /**
+     * Chargement des variables globales d'environnement.
+     *
+     * @return void
+     */
+    protected function envLoad(): void
+    {
+        try {
+            $this->share(Dotenv::class, $dotenv = Dotenv::createImmutable($this->basePath));
+            $dotenv->load();
+        } catch (InvalidPathException $e) {
+            unset($e);
+        }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getBasePath(): string
+    {
+        return $this->basePath;
+    }
 
     /**
      * @inheritDoc

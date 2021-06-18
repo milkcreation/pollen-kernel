@@ -49,8 +49,10 @@ class Kernel implements KernelInterface
      */
     protected $startTime;
 
-    public function __construct()
+    public function __construct(ApplicationInterface $app)
     {
+        $this->app = $app;
+
         if (!self::$instance instanceof static) {
             self::$instance = $this;
         }
@@ -77,7 +79,6 @@ class Kernel implements KernelInterface
         if (!$this->isBooted()) {
             $this->startTime = defined('START_TIME') ? START_TIME : microtime(true);
 
-            $this->bootApp();
             $this->bootConfig();
             $this->bootContainer();
             $this->bootProxies();
@@ -91,22 +92,6 @@ class Kernel implements KernelInterface
     }
 
     /**
-     * Chargement de l'application.
-     *
-     * @return void
-     */
-    protected function bootApp(): void
-    {
-        $this->app = class_exists(App::class) ? new App() : new Application();
-
-        if (!$this->app instanceof ApplicationInterface) {
-            throw new RuntimeException(sprintf('Application must be an instance of %s', ApplicationInterface::class));
-        }
-
-        $this->app->share(KernelInterface::class, $this);
-    }
-
-    /**
      * Chargement de la configuration.
      *
      * @return void
@@ -117,8 +102,7 @@ class Kernel implements KernelInterface
 
         $configurator->addSchema('app_url', Expect::string());
         $configurator->addSchema('timezone', Expect::string());
-
-        $configurator->set('truc', 'machin');
+        
         /** @todo Depuis le framework */
         $configurator->set(
             array_merge(
