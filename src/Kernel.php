@@ -14,20 +14,11 @@ use Throwable;
 
 class Kernel implements KernelInterface
 {
-    /**
-     * @var static|null
-     */
-    private static $instance;
+    private static ?KernelInterface $instance = null;
 
-    /**
-     * @var RouterInterface
-     */
-    protected $router;
+    protected RouterInterface $router;
 
-    /**
-     * @var ApplicationInterface
-     */
-    protected $app;
+    protected ApplicationInterface $app;
 
     public function __construct(ApplicationInterface $app)
     {
