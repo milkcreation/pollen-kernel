@@ -334,12 +334,7 @@ class Application extends Container implements ApplicationInterface
      */
     protected function envLoad(): void
     {
-        try {
-            $this->share(Dotenv::class, $dotenv = Dotenv::createImmutable($this->basePath));
-            $dotenv->load();
-        } catch (InvalidPathException $e) {
-            unset($e);
-        }
+        Env::load($this->getBasePath());
     }
 
     /**
