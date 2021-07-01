@@ -7,7 +7,7 @@
     "component",
     "kernel"
   ],
-  "time": "2021-06-23",
+  "time": "2021-07-01",
   "license": "MIT",
   "authors": [
     {
@@ -22,8 +22,7 @@
     }
   ],
   "require": {
-    "php": ">=7.4",
-    "composer/installers": "~1.0",
+    "php": "^7.4 || ^8.0",
     "pollen-solutions/config": "^1.0",
     "pollen-solutions/container": "^1.0",
     "pollen-solutions/event": "^1.0",
