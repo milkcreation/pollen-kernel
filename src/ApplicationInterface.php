@@ -13,6 +13,7 @@ use Pollen\Database\DatabaseManagerInterface;
 use Pollen\Debug\DebugManagerInterface;
 use Pollen\Encryption\EncrypterInterface;
 use Pollen\Event\EventDispatcherInterface;
+use Pollen\Faker\FakerInterface;
 use Pollen\Field\FieldManagerInterface;
 use Pollen\Filesystem\StorageManagerInterface;
 use Pollen\Form\FormManagerInterface;
@@ -36,8 +37,10 @@ use Psr\Http\Message\ServerRequestInterface;
  * @property-read DatabaseManagerInterface db
  * @property-read DebugManagerInterface debug
  * @property-read EventDispatcherInterface event
+ * @property-read FakerInterface faker
  * @property-read FieldManagerInterface field
  * @property-read FormManagerInterface form
+ * @property-read KernelInterface kernel
  * @property-read LogManagerInterface log
  * @property-read MailManagerInterface mail
  * @property-read MetaboxManagerInterface metabox
@@ -52,56 +55,67 @@ use Psr\Http\Message\ServerRequestInterface;
 interface ApplicationInterface extends BuildableTraitInterface, ContainerInterface
 {
     /**
-     * Chargement.
+     * Booting.
      *
      * @return void
      */
     public function boot(): void;
 
     /**
-     * Initialisation.
+     * Initialization.
      *
      * @return ApplicationInterface
      */
     public function build(): ApplicationInterface;
 
     /**
-     * Récupération du chemin absolue vers la racine du projet.
+     * Get the path of application. Optionally a subdirectory or file included.
+     *
+     * @param string|null $path
      *
      * @return string
      */
-    public function getBasePath(): string;
+    public function getBasePath(?string $path = null): string;
 
     /**
-     * Récupération de la liste des fournisseurs de service.
+     * Get the public path of application. Optionally a subdirectory or file included.
+     *
+     * @param string|null $path
+     *
+     * @return string
+     */
+    public function getPublicPath(?string $path = null): string;
+
+    /**
+     * Get list of service providers served by application.
      *
      * @return ServiceProviderInterface[]|array
      */
     public function getServiceProviders(): array;
 
     /**
-     * Récupération du numéro de version de l'application.
+     * Get version number of application.
      *
      * @return string
      */
     public function getVersion(): string;
 
     /**
-     * Déclaration des aliases de services fournis par le conteneur d'injection de dépendances.
+     * Register aliases of services provided by application.
      *
      * @return void
      */
     public function registerAliases(): void;
 
     /**
-     * Détermine si l'application est lancée dans une console.
+     * Determine if the application is running in the console.
      *
-     * @return boolean
+     * @return bool
      */
     public function runningInConsole(): bool;
 
     /**
-     * Définition des paramètres de configuration.
+     * Set configuration parameters.
      *
      * @param array $configParams
      *
