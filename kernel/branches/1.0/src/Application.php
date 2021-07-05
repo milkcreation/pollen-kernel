@@ -10,6 +10,8 @@ use Pollen\Asset\AssetManager;
 use Pollen\Asset\AssetManagerInterface;
 use Pollen\Config\Configurator;
 use Pollen\Config\ConfiguratorInterface;
+use Pollen\Console\Console;
+use Pollen\Console\ConsoleInterface;
 use Pollen\Container\BootableServiceProviderInterface;
 use Pollen\Container\Container;
 use Pollen\Container\ServiceProviderInterface;
@@ -63,6 +65,7 @@ use Throwable;
 /**
  * @property-read AssetManagerInterface asset
  * @property-read ConfiguratorInterface config
+ * @property-read ConsoleInterface console
  * @property-read CookieJarInterface cookie
  * @property-read EncrypterInterface crypt
  * @property-read DatabaseManagerInterface database
@@ -149,6 +152,12 @@ class Application extends Container implements ApplicationInterface
      * @var BootableServiceProviderInterface[]|array
      */
     protected array $bootableProviders = [];
+
+    /**
+     * Application is running in console indicator.
+     * @var bool|null
+     */
+    protected ?bool $isRunningInConsole = null;
 
     /**
      * @param string $basePath
@@ -426,6 +435,10 @@ class Application extends Container implements ApplicationInterface
                     'config',
                     Configurator::class,
                 ],
+                ConsoleInterface::class         => [
+                    'console',
+                    Console::class,
+                ],
                 CookieJarInterface::class       => [
                     'cookie',
                     CookieJar::class,
@@ -519,17 +532,13 @@ class Application extends Container implements ApplicationInterface
      */
     public function runningInConsole(): bool
     {
-        global $argv;
-
-        if (isset($_ENV['APP_RUNNING_IN_CONSOLE'])) {
-            return $_ENV['APP_RUNNING_IN_CONSOLE'] === 'true';
+        if ($this->isRunningInConsole === null) {
+            $this->isRunningInConsole = Env::get(
+                    'APP_RUNNING_IN_CONSOLE'
+                ) ?? (PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg');
         }
 
-        if (isset($argv[0]) && preg_match('/vendor\/bin\/bee$/', $argv[0])) {
-            return true;
-        }
-
-        return isset($argv[0]) && ($argv[0] === 'console') && (PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg');
+        return $this->isRunningInConsole;
     }
 
     /**
