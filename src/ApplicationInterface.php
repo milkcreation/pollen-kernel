@@ -108,7 +108,7 @@ interface ApplicationInterface extends BuildableTraitInterface, ContainerInterfa
     public function registerAliases(): void;
 
     /**
-     * Determine if the application is running in the console.
+     * Check if the application is running in the console.
      *
      * @return bool
      */
