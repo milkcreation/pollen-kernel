@@ -20,30 +20,32 @@ use Pollen\Log\LogManagerInterface;
 use Pollen\Routing\RouterInterface;
 use Pollen\Support\Env;
 use Pollen\Validation\ValidatorInterface;
+use Pollen\View\ViewManagerInterface;
+use Pollen\View\ViewInterface;
 
 if (!function_exists('app')) {
     /**
-     * Instance de l'application
+     * App instance|Service provides by the dependency injection container.
      *
-     * @param string|null $abstract Nom de qualification du service.
+     * @param string|null $serviceAlias
      *
      * @return ApplicationInterface|mixed
      */
-    function app(?string $abstract = null)
+    function app(?string $serviceAlias = null)
     {
         $app = Kernel::getInstance()->getApp();
 
-        if ($abstract === null) {
+        if ($serviceAlias === null) {
             return $app;
         }
 
-        return $app[$abstract] ?? null;
+        return $app->get($serviceAlias);
     }
 }
 
 if (!function_exists('asset')) {
     /**
-     * Instance du gestionnaire des assets.
+     * Asset manager instance.
      *
      * @return AssetManagerInterface
      */
@@ -55,11 +57,11 @@ if (!function_exists('asset')) {
 
 if (!function_exists('config')) {
     /**
-     * Config - Gestionnaire de configuration de l'application.
+     * Configurator instance|Set config|Get config.
      * {@internal
-     * - null $key Retourne l'instance du controleur de configuration.
-     * - array $key Définition d'attributs de configuration.
-     * - string $key Récupération de la valeur d'un attribut de configuration.
+     * - null $key to get Configurator instance.
+     * - array $key to set config attributes.
+     * - string $key to get config attribute value.
      * }
      *
      * @param null|array|string $key
@@ -86,7 +88,7 @@ if (!function_exists('config')) {
 
 if (!function_exists('database')) {
     /**
-     * Instance du gestionnaire de base de données|Constructeur de requêtes d'une table de la base de données.
+     * Database manager instance|Get the query builder associated with a specific table.
      *
      * @param string|null $table
      *
@@ -94,19 +96,19 @@ if (!function_exists('database')) {
      */
     function database(?string $table = null)
     {
-        /* @var DatabaseManagerInterface $manager */
-        $manager = app(DatabaseManagerInterface::class);
+        /* @var DatabaseManagerInterface $dbManager */
+        $dbManager = app(DatabaseManagerInterface::class);
 
         if ($table === null) {
-            return $manager;
+            return $dbManager;
         }
-        return $manager::table($table);
+        return $dbManager::table($table);
     }
 }
 
 if (!function_exists('env')) {
     /**
-     * Récupération d'une variables d'environnement.
+     * Get global environment variable value.
      *
      * @param string $key
      * @param mixed $default
@@ -121,7 +123,7 @@ if (!function_exists('env')) {
 
 if (!function_exists('event')) {
     /**
-     * Instance du répartiteur d'événements.
+     * Event dispatcher instance.
      *
      * @return EventDispatcherInterface
      */
@@ -133,7 +135,7 @@ if (!function_exists('event')) {
 
 if (!function_exists('field')) {
     /**
-     * Instance du gestionnaire de champs|Instance d'un champ déclaré.
+     * Field Manager instance|Instance of a registered field.
      *
      * @param string|null $alias
      * @param mixed $idOrParams
@@ -155,7 +157,7 @@ if (!function_exists('field')) {
 
 if (!function_exists('form')) {
     /**
-     * Instance du gestionnaire de formulaires|Instance d'un formulaire.
+     * Form Manager instance|Instance of a registered form.
      *
      * @param string|null $name
      *
@@ -175,7 +177,7 @@ if (!function_exists('form')) {
 
 if (!function_exists('logger')) {
     /**
-     * Instance du gestionnaire de journalisation|Déclaration d'un message de journalisation.
+     * Logger instance|Set a new log message.
      *
      * @param string|null $message
      * @param array $context
@@ -196,7 +198,7 @@ if (!function_exists('logger')) {
 
 if (!function_exists('partial')) {
     /**
-     * Instance du gestionnaire de portions d'affichage|Instance d'une portion d'affichage déclarée.
+     * Partial Manager instance|Instance of a registered partial.
      *
      * @param string|null $alias
      * @param mixed $idOrParams
@@ -218,7 +220,7 @@ if (!function_exists('partial')) {
 
 if (!function_exists('request')) {
     /**
-     * Instance de la requête HTTP principale.
+     * HTTP Request instance.
      *
      * @return RequestInterface
      */
@@ -230,7 +232,7 @@ if (!function_exists('request')) {
 
 if (!function_exists('route')) {
     /**
-     * Récupération de l'url d'une route déclarée.
+     * Get route url for a registered route.
      *
      * @param string $name
      * @param array $parameters
@@ -249,7 +251,7 @@ if (!function_exists('route')) {
 
 if (!function_exists('storage')) {
     /**
-     * Gestionnaire de système de fichier|Instance d'un point de montage.
+     * Storage Manager instance|Get instance of Filesystem corresponding to a registered disk (aka mounting point).
      *
      * @param string|null $name
      *
@@ -269,7 +271,7 @@ if (!function_exists('storage')) {
 
 if (!function_exists('validator')) {
     /**
-     * Instance du gestionnaire de validation.
+     * Validator instance.
      *
      * @return ValidatorInterface
      */
@@ -278,3 +280,25 @@ if (!function_exists('validator')) {
         return app(ValidatorInterface::class);
     }
 }
+
+if (!function_exists('view')) {
+    /**
+     * View instance|Template render
+     *
+     * @param string|null $name
+     * @param array $datas
+     *
+     * @return ViewManagerInterface|ViewInterface|string
+     */
+    function view(?string $name = null, array $datas = [])
+    {
+        /** @var ViewManagerInterface $view */
+        $view = app(ViewManagerInterface::class);
+
+        if ($name === null) {
+            return $view;
+        }
+        return $view->render($name, $datas);
+    }
+}
+
