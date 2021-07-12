@@ -14,11 +14,23 @@ use Throwable;
 
 class Kernel implements KernelInterface
 {
+    /**
+     * Kernel main instance
+     * @var KernelInterface|null
+     */
     private static ?KernelInterface $instance = null;
 
-    protected RouterInterface $router;
-
+    /**
+     * Application main instance.
+     * @var ApplicationInterface
+     */
     protected ApplicationInterface $app;
+
+    /**
+     * Router main instance.
+     * @var RouterInterface|null
+     */
+    protected ?RouterInterface $router = null;
 
     public function __construct(ApplicationInterface $app)
     {
@@ -30,7 +42,7 @@ class Kernel implements KernelInterface
     }
 
     /**
-     * Récupération de l'instance principale.
+     * Get kernel main instance.
      *
      * @return static
      */
@@ -62,11 +74,10 @@ class Kernel implements KernelInterface
             $this->app->build();
         }
 
-        if (! $this->app->has(RouterInterface::class)) {
+        if (!$this->app->has(RouterInterface::class)) {
             try {
                 $this->app->share(RouterInterface::class, new Router([], $this->app));
-            } catch(Throwable $e) {
-
+            } catch (Throwable $e) {
             }
         }
 
@@ -88,6 +99,6 @@ class Kernel implements KernelInterface
      */
     public function terminate(RequestInterface $request, ResponseInterface $response): void
     {
-       $this->router->terminateEvent($request, $response);
+        $this->router->terminateEvent($request, $response);
     }
 }
