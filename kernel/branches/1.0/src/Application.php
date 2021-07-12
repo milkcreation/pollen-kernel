@@ -101,7 +101,7 @@ class Application extends Container implements ApplicationInterface
      * Current application version number.
      * @var string
      */
-    protected const VERSION = '1.0.x-dev';
+    protected const VERSION = '1.0.0';
 
     /**
      * Application base path.
@@ -141,14 +141,12 @@ class Application extends Container implements ApplicationInterface
 
     /**
      * List of services providers served by application.
-     *
      * @var ServiceProviderInterface[]
      */
     protected array $serviceProviders = [];
 
     /**
      * List of bootable service providers.
-     *
      * @var BootableServiceProviderInterface[]|array
      */
     protected array $bootableProviders = [];

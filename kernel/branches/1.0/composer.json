@@ -1,24 +1,18 @@
 {
   "name": "pollen-solutions/kernel",
-    "description": "Pollen Kernel Component",
+  "description": "Pollen Solutions - Kernel Component - Basic tools for building a web application based on the Pollen Solutions component suite.",
   "homepage": "https://www.presstify.com/pollen-solutions/kernel/",
   "keywords": [
     "pollen-solutions",
     "component",
     "kernel"
   ],
-  "time": "2021-07-06",
+  "time": "2021-07-09",
   "license": "MIT",
   "authors": [
     {
       "name": "Jordy Manner",
       "email": "jordy@presstify.com"
-    }
-  ],
-  "repositories": [
-    {
-      "type": "composer",
-      "url": "https://composer.presstify.com/pollen-solutions/"
     }
   ],
   "require": {

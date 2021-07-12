@@ -10,14 +10,14 @@ use Pollen\Http\ResponseInterface;
 interface KernelInterface
 {
     /**
-     * Récupération de l'instance de l'application.
+     * Get application instance.
      *
      * @return ApplicationInterface
      */
     public function getApp(): ApplicationInterface;
 
     /**
-     * Traitement de la requête HTTP.
+     * Handles HTTP Request.
      *
      * @param RequestInterface $request
      *
@@ -26,7 +26,7 @@ interface KernelInterface
     public function handle(RequestInterface $request): ResponseInterface;
 
     /**
-     * Envoi de la réponse HTTP.
+     * Send HTTP request.
      *
      * @param ResponseInterface $response
      *
@@ -35,7 +35,7 @@ interface KernelInterface
     public function send(ResponseInterface $response): bool;
 
     /**
-     * Termine le cycle de la requête et de la réponse HTTP.
+     * Terminate HTTP request and response cycle.
      *
      * @param RequestInterface $request
      * @param ResponseInterface $response
