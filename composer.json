@@ -1,13 +1,13 @@
 {
   "name": "pollen-solutions/kernel",
   "description": "Pollen Solutions - Kernel Component - Basic tools for building a web application based on the Pollen Solutions component suite.",
-  "homepage": "https://www.presstify.com/pollen-solutions/kernel/",
+  "homepage": "https://github.com/milkcreation/pollen-kernel.git",
   "keywords": [
     "pollen-solutions",
     "component",
     "kernel"
   ],
-  "time": "2021-07-09",
+  "time": "2021-09-15",
   "license": "MIT",
   "authors": [
     {
